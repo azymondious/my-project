@@ -1,12 +1,13 @@
-from bottle import Bottle, request, run, static_file, template
+from bottle import Bottle, request, static_file, template
 import requests
+import os
 
 app = Bottle()
 
-# Wells Fargo API credentials (Replace with actual credentials)
-CLIENT_ID = "your_client_id"
-CLIENT_SECRET = "your_client_secret"
-ACCESS_TOKEN = "your_access_token"
+# Wells Fargo API credentials (store sensitive data as environment variables in Render)
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 
 # Wells Fargo API base URL
 BASE_URL = "https://api.wellsfargo.com"
@@ -38,7 +39,6 @@ def fetch_transactions():
 
 @app.route('/analyze-spending', method='POST')
 def analyze_spending():
-    # Example: Analyze and categorize spending
     data = request.json
     transactions = data.get("transactions", [])
     spending = {}
@@ -51,11 +51,12 @@ def analyze_spending():
     return {"spending": spending}
 
 
-# Serve static files (e.g., CSS, JS) if needed
 @app.route('/static/<filepath:path>')
 def serve_static(filepath):
     return static_file(filepath, root='./static')
 
 
 if __name__ == "__main__":
-    run(app, host="0.0.0.0", port=8080, debug=True)
+    # Use host 0.0.0.0 and port from the PORT environment variable (default 8080)
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
