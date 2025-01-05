@@ -1,10 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Home</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BudgetBuddy</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f9;
+    }
+
+    header {
+      background: #4caf50;
+      color: white;
+      padding: 1rem 2rem;
+      text-align: center;
+    }
+
+    main {
+      padding: 2rem;
+    }
+
+    .btn {
+      background: #4caf50;
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: #45a049;
+    }
+
+    #transactions {
+      margin-top: 1rem;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 1rem;
+    }
+  </style>
 </head>
 <body>
-    <h1>Welcome to the Bottle App!</h1>
-    <a href="/about">About</a>
+  <header>
+    <h1>BudgetBuddy</h1>
+    <p>Smart Money Management Made Simple</p>
+  </header>
+  <main>
+    <h2>Welcome to BudgetBuddy!</h2>
+    <p>Click below to fetch your transactions:</p>
+    <button class="btn" id="fetch-btn">Fetch Transactions</button>
+
+    <div id="transactions">
+      <h3>Your Transactions</h3>
+      <ul id="transaction-list"></ul>
+    </div>
+  </main>
+
+  <script>
+    document.getElementById("fetch-btn").addEventListener("click", async () => {
+      try {
+        const response = await fetch('/transactions?account_id=123456'); // Replace with actual account ID
+        if (response.ok) {
+          const data = await response.json();
+          const transactions = data.transactions || [];
+          const list = document.getElementById("transaction-list");
+          list.innerHTML = ""; // Clear previous data
+          transactions.forEach(txn => {
+            const item = document.createElement("li");
+            item.textContent = `${txn.date}: ${txn.description} - $${txn.amount}`;
+            list.appendChild(item);
+          });
+        } else {
+          alert("Failed to fetch transactions.");
+        }
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    });
+  </script>
 </body>
 </html>
