@@ -54,9 +54,12 @@
             text-align: center;
             font-size: 16px;
             cursor: pointer;
+            transition: all 0.3s ease; /* Smooth transition for hover effects */
         }
         .btn:hover {
             background-color: #45a049;
+            transform: scale(1.1); /* Slightly increase size */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
         }
         footer {
             text-align: center;
@@ -83,34 +86,4 @@
         <ul>
             <li>Track transactions from your Wells Fargo account.</li>
             <li>Analyze your spending patterns with visual reports.</li>
-            <li>Set savings goals and monitor your progress.</li>
-            <li>Get smart money-saving tips personalized for you.</li>
-        </ul>
-        <button class="btn" onclick="fetchTransactions()">View My Transactions</button>
-    </section>
-    <section id="transactions">
-        <h2>Recent Transactions</h2>
-        <div id="transaction-list">
-            <p>Click "View My Transactions" to load your data.</p>
-        </div>
-    </section>
-    <footer>
-        <p>&copy; 2025 BudgetBuddy | All Rights Reserved</p>
-    </footer>
-    <script>
-        async function fetchTransactions() {
-            try {
-                const response = await fetch('/transactions');
-                const data = await response.json();
-
-                const transactionList = document.getElementById('transaction-list');
-                transactionList.innerHTML = ''; // Clear previous content
-
-                if (data.transactions && data.transactions.length > 0) {
-                    data.transactions.forEach(txn => {
-                        const txnElement = document.createElement('p');
-                        txnElement.textContent = `${txn.date} - ${txn.description}: $${txn.amount}`;
-                        transactionList.appendChild(txnElement);
-                    });
-                } else {
-                    transactionList.innerHTML = '<p>No transacti
+            <li>Set savings goals
