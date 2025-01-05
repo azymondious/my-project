@@ -1,6 +1,5 @@
 from bottle import Bottle, run, request, static_file
 import os
-import json
 
 # Initialize the Bottle app
 app = Bottle()
@@ -8,39 +7,16 @@ app = Bottle()
 # Route: Serve the homepage
 @app.route('/')
 def home():
-    return static_file('index.html', root='./templates')
+    # Serve the index.html from the "views" folder
+    return static_file('index.html', root='./views')
 
-# Route: Fetch transactions (dummy data for now)
-@app.route('/transactions')
-def get_transactions():
-    account_id = request.query.get('account_id')
-    # Replace this with a real API call to fetch transactions
-    transactions = [
-        {"date": "2025-01-01", "description": "Groceries", "amount": 54.99},
-        {"date": "2025-01-02", "description": "Gas Station", "amount": 40.00},
-        {"date": "2025-01-03", "description": "Coffee Shop", "amount": 5.50},
-    ]
-    return {"transactions": transactions}
+# Route: Serve the About page
+@app.route('/about')
+def about():
+    # Serve the about.html from the "views" folder
+    return static_file('about.html', root='./views')
 
-# Route: Analyze spending (dummy analysis for now)
-@app.route('/analyze-spending', method='POST')
-def analyze_spending():
-    data = request.json
-    transactions = data.get("transactions", [])
-    
-    # Simple analysis: Sum amounts by category
-    spending = {}
-    for txn in transactions:
-        category = txn.get("description", "Other")
-        amount = float(txn.get("amount", 0))
-        if category in spending:
-            spending[category] += amount
-        else:
-            spending[category] = amount
-
-    return {"spending": spending}
-
-# Route: Serve static files (e.g., CSS, JS)
+# Route: Serve static files (optional, if you have assets like CSS/JS)
 @app.route('/static/<filepath:path>')
 def serve_static(filepath):
     return static_file(filepath, root='./static')
