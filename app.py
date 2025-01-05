@@ -1,62 +1,57 @@
-from bottle import Bottle, request, static_file, template
-import requests
+from bottle import Bottle, run, request, static_file
 import os
+import json
 
+# Initialize the Bottle app
 app = Bottle()
 
-# Wells Fargo API credentials (store sensitive data as environment variables in Render)
-CLIENT_ID = os.getenv("CLIENT_ID")
-CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
-
-# Wells Fargo API base URL
-BASE_URL = "https://api.wellsfargo.com"
-
-
+# Route: Serve the homepage
 @app.route('/')
 def home():
-    # Serve the HTML file (index.html)
     return static_file('index.html', root='./templates')
 
+# Route: Fetch transactions (dummy data for now)
+@app.route('/transactions')
+def get_transactions():
+    account_id = request.query.get('account_id')
+    # Replace this with a real API call to fetch transactions
+    transactions = [
+        {"date": "2025-01-01", "description": "Groceries", "amount": 54.99},
+        {"date": "2025-01-02", "description": "Gas Station", "amount": 40.00},
+        {"date": "2025-01-03", "description": "Coffee Shop", "amount": 5.50},
+    ]
+    return {"transactions": transactions}
 
-@app.route('/transactions', method='GET')
-def fetch_transactions():
-    account_id = request.query.account_id  # Get account ID from frontend query string
-    url = f"{BASE_URL}/transactions/v1/accounts/{account_id}/transactions"
-
-    headers = {
-        "Authorization": f"Bearer {ACCESS_TOKEN}",
-        "Accept": "application/json",
-    }
-
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        transactions = response.json()
-        return transactions
-    else:
-        return {"error": response.text}, response.status_code
-
-
+# Route: Analyze spending (dummy analysis for now)
 @app.route('/analyze-spending', method='POST')
 def analyze_spending():
     data = request.json
     transactions = data.get("transactions", [])
+    
+    # Simple analysis: Sum amounts by category
     spending = {}
-
     for txn in transactions:
-        category = txn.get("category", "Uncategorized")
+        category = txn.get("description", "Other")
         amount = float(txn.get("amount", 0))
-        spending[category] = spending.get(category, 0) + amount
+        if category in spending:
+            spending[category] += amount
+        else:
+            spending[category] = amount
 
     return {"spending": spending}
 
-
+# Route: Serve static files (e.g., CSS, JS)
 @app.route('/static/<filepath:path>')
 def serve_static(filepath):
     return static_file(filepath, root='./static')
 
+# Error Handler for 404
+@app.error(404)
+def error404(error):
+    return "The page you're looking for does not exist. Check the URL and try again."
 
+# Run the app when executed directly
 if __name__ == "__main__":
-    # Use host 0.0.0.0 and port from the PORT environment variable (default 8080)
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host="0.0.0.0", port=port)
+    # Use host "0.0.0.0" and a dynamic port from Render (or default to 8080 locally)
+    port = int(os.getenv("PORT", 8080))
+    run(app, host="0.0.0.0", port=port, debug=True)
